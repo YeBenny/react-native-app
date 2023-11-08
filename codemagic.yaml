@@ -1,0 +1,26 @@
+# Check out https://docs.codemagic.io/getting-started/building-a-react-native-app/ for more information
+# Please review and update values in curly braces
+
+workflows:
+  react-native:
+    name: React Native App
+    environment:
+      vars:
+        XCODE_WORKSPACE: 'ReactNativeApp'
+        XCODE_SCHEME: 'ReactNativeApp'
+        CM_KEYSTORE: Encrypted(...)
+        CM_KEYSTORE_PASSWORD: Encrypted(...)
+        CM_KEY_PASSWORD: Encrypted(...)
+        CM_KEY_ALIAS: Encrypted(...)
+      node: latest
+    scripts:
+      - npm install
+      - echo "sdk.dir=$HOME/programs/android-sdk-macosx" > "$CM_BUILD_DIR/android/local.properties"
+      - |
+        chmod -R 777 $CM_BUILD_DIR
+        echo $CM_KEYSTORE | base64 --decode > $CM_BUILD_DIR/keystore.jks
+        # build Android
+        cd android
+        ./gradlew assembleRelease
+    artifacts:
+      - android/app/build/outputs/**/**/*.apk
